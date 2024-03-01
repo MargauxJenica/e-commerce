@@ -8,7 +8,7 @@ router.get('/', async (req, res) => {
   // be sure to include its associated Products
   try {
     const categoryData = await Category.findAll({
-      include: [{ model: Product, as: 'products' }]
+      include: [{ model: Product, attributes:['id'] }]
   });
     res.status(200).json(categoryData);
   } catch(err) {
@@ -21,7 +21,7 @@ router.get('/:id', async (req, res) => {
   // be sure to include its associated Products
   try {
     const categoryData = await Category.findByPk(req.params.id, {
-      include: [{ model: Product, as: 'products' }]
+      include: [{ model: Product, attributes: ['id'] }],
   });
     res.status(200).json(categoryData);
   } catch(err) {
@@ -35,6 +35,7 @@ router.post('/', async (req, res) => {
     const categoryData = await Category.create(req.body);
     res.status(200).json(categoryData);
   } catch(err) {
+    console.error(err);
     res.status(500).json(err);
   }
 });
@@ -45,16 +46,17 @@ router.put('/:id', async (req, res) => {
   const { category_name } = req.body;
   
   try {
-    const updatedCategory = await Category.update({ category_name }, {
+    const categoryData = await Category.update({ category_name }, {
       where: { id: categoryId }
     });
 
-    if(!updatedCategory){
+    if(!categoryData){
       res.status(404).json({message: "No category with that id."});
       return;
     }
-    res.status(200).json(updatedCategory);
+    res.status(200).json(categoryData);
   } catch(err) {
+    console.error(err);
     res.status(500).json(err);
   }
 });
@@ -62,12 +64,12 @@ router.put('/:id', async (req, res) => {
 router.delete('/:id', async (req, res) => {
   // delete a category by its `id` value
   try {
-    const destroyedCategory = await Category.destroy({where: { id: req.params.id }});
-    if(!destroyedCategory){
+    const categoryData = await Category.destroy({where: { id: req.params.id }});
+    if(!categoryData){
       res.status(404).json({message: "No category with that id."});
     }
     
-    res.status(200).json(destroyedCategory);
+    res.status(200).json(categoryData);
   } catch(err) {
     res.status(500).json(err);
   }
